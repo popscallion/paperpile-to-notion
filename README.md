@@ -2,23 +2,60 @@
 
 A simple tool to automatically sync your Paperpile library with a Notion database.
 
-To use, please (1) fork or template this repo, and (2) follow the instructions at [seba-1511's README](https://github.com/seba-1511/sync-paperpile-notion/blob/5af47cfa94cf957fd9dd3010ad42d6dd41fd38fc/README.md). EXCEPT that your Notion database should have the following column titles/types:
+## Notion Setup
 
-```
-"Reference ID": title
-"Title": rich_text
-"Authors": rich_text
-"Year": rich_text
-```
+1. Create a new page (e.g. "Papers").
+2. On your page, add a new Table view.
+3. Select "New table" in the New view dropdown, and name it something sensible, e.g. "Paperpile." 
+5. Delete any empty rows from the table, and modify it so it has at minimum the following properties:
 
-Please also make sure to delete any blank rows from your Notion database!
+    1. `Reference ID` of type Title.
+    2. `Title` of type Text.
+    3. `Authors` of type Text.
+    4. `Year` of type Text.
+    5. `Link` of type URL.
 
-My Paperpile BibTeX settings are as follows:
+6. Get the **database identifier** from the database page. If your database url is:
 
-<img width="588" alt="image" src="https://github.com/apoorvkh/paperpile-to-notion/assets/7005565/d3e807c9-21fb-4761-bab0-824df20c36e2">
+    ```
+    https://www.notion.so/my_workspace/aaaabbbbccccddddeeeeffffgggghhhh?v=iiiiiiijjjjkkkkllll
+    ```
 
-This repository should be stable, but I plan on adding more features in the future.
+    Then the database identifier is: `aaaabbbbccccddddeeeeffffgggghhhh`. The string starting with `?v=` refers to a specific view of the database, and can be omitted.
+
+7. Create a new integration on [https://www.notion.so/my-integrations/](https://www.notion.so/my-integrations/).
+
+    1. Name: Paperpile to Notion
+    2. Associated Workspace: Workspace of the database.
+    3. Content Capabilities: Read Content, Update Content, Insert Content.
+    4. User Capabilities: Read user information, including email addresses.
+    5. Press "Submit" and copy the **Internal Integration Token**.
+
+8. On the database page, click "Share" (top right) and add "Paperpile to Notion" with edit access.
+
+## GitHub Setup
+
+1. Fork this repository.
+2. On your fork, go to: "Settings -> Secrets and variables -> Actions".
+3. Create 2 new repository secrets named exactly:
+    
+    1. `NOTION_TOKEN`: Your integration's internal integration token, from step 3.5 above.
+    2. `DATABASE_IDENTIFIER`: Your database identifier, from step 2 above.
+
+
+## Paperpile Setup
+
+1. Click on the top-right gear icon, and go to "Workflows and Integrations".
+2. Follow the instructions to add a new "BibTeX Export", choosing:
+
+    1. Your GitHub repository fork as the repository. You can find the details under "Code -> Local -> Clone -> SSH."
+    2. `references.bib` as the export path.
+
+The first sync should start as soon as the Paperpile workflow is created, and subsequent syncs are triggered whenever papers are added or updated in your Paperpile.
+
+**Note**
+The first sync might take some time as Notion limits the API rate to ~ 3 requests / second; so if you have 1,000 papers it'll take ~ 6 minutes before they are all available in Notion.
 
 ---
 
-Inspired by [jmuchovej/paperpile-notion](https://github.com/jmuchovej/paperpile-notion) and [seba-1511/sync-paperpile-notion](https://github.com/seba-1511/sync-paperpile-notion). Actually, this is effectively a fork/rewrite of seba-1511's repository, so much original credit goes to them.
+Forked from [apoorvkh/paperpile-to-notion](https://github.com/apoorvkh/paperpile-to-notion), which in turn was rewritten from [seba-1511/sync-paperpile-notion](https://github.com/seba-1511/sync-paperpile-notion). 
